@@ -8,7 +8,7 @@ EnvelopeSequence::EnvelopeSequence(float tempo, juce::uint32 signatureDenominato
   for (int i = 0; i < 16; ++i)
     sequence.push_back(AHR {});
 
-  totalSeconds = (tempo / 60.0f) * (static_cast<float>(noteSubdivision) / signatureDenominator);
+  totalSeconds = (60.0f/ tempo) * (static_cast<float>(noteSubdivision) / signatureDenominator);
 }
 
 EnvelopeSequence::~EnvelopeSequence() {
@@ -38,7 +38,7 @@ void EnvelopeSequence::setTempoSync(float tempo, juce::uint32 signatureDenominat
   if (tempo > 0 && signatureDenominator == 0){
     throw std::invalid_argument("Signature Denominator is 0 or tempo is not greater than 0");
   }
-  totalSeconds = (tempo / 60.0f) * (static_cast<float>(noteSubdivision) / signatureDenominator);
+  totalSeconds = (60.0f / tempo) * (static_cast<float>(noteSubdivision) / signatureDenominator);
 }
 
 void EnvelopeSequence::setNoteSubdivision(juce::uint32 sub) {
@@ -47,3 +47,4 @@ void EnvelopeSequence::setNoteSubdivision(juce::uint32 sub) {
   }
   noteSubdivision = sub;
 }
+
