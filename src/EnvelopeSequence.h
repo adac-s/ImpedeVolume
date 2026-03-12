@@ -14,10 +14,12 @@ public:
 
   float getStage(EnvelopeStage); 
   float getTotalSeconds() noexcept;
+  float getHoldVolume() noexcept;
   
-  void setTotalSeconds (float totalSeconds);
+  void setTotalSeconds (float seconds);
   void setAllStagesTime (float attack, float hold, float release); // set proportion of all stages, if sum of values does not equal to 1, set to normalized values
   void setStageTime (EnvelopeStage stage, float value); // set proportion to 1 stage, compnsating by taking away from the rest of the stages
+  void setHoldVolume (float volume);
   
   void trigger () noexcept; // corresponds to juce::ADSR::NoteOn() -> Since this is a triggered LFO, no NoteOff is needed
   void reset() noexcept;

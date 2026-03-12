@@ -1,7 +1,77 @@
 #include "EnvelopeSequence.h"
 #include "juce_core/juce_core.h"
+#include <limits>
 #include <stdexcept>
 #include <vector>
+
+float AHR::getStage(EnvelopeStage stage) {
+  switch (stage) {
+    case EnvelopeStage::Attack:
+      return attackTime;
+    case EnvelopeStage::Hold:
+      return holdTime;
+    case EnvelopeStage::Release:
+      return releaseTime;
+    default:
+      throw std::invalid_argument("Invalid Envelope Stage queried");
+  }
+}
+
+float AHR::getTotalSeconds() noexcept {
+  return totalSeconds;
+}
+
+float AHR::getHoldVolume() noexcept {
+  return holdVolume;
+}
+
+void AHR::setTotalSeconds(float seconds) {
+  totalSeconds = seconds;
+}
+
+void AHR::setHoldVolume(float volume) {
+  holdVolume = volume;
+}
+
+void AHR::setAllStagesTime(float attack, float hold, float release) {
+  float compositeTime = attack + hold +release;
+  if (std::abs(compositeTime - 1.0) >= std::numeric_limits<float>().epsilon()) {
+    attack = attack / compositeTime;
+    hold = hold / compositeTime;
+    release = release / compositeTime;
+  }
+
+  attackTime = attack;
+  holdTime = hold;
+  releaseTime = release;
+}
+
+void AHR::setStageTime(EnvelopeStage stage, float newTime) {
+  if (stage == EnvelopeStage::Attack) {
+    // If attack, take away from hold, then release
+    float newHold = holdTime - (attackTime - newTime);
+    attackTime = newTime;
+    if (newHold <= 0.0) {
+      holdTime = 0.0;
+      releaseTime = -newHold;
+    }
+    else {
+      holdTime = newHold;
+    }
+  }
+  else if (stage == EnvelopeStage::Release) {
+  // If release, take away from hold, then attack
+    float newHold = holdTime - (releaseTime - newTime);
+    releaseTime = newTime;
+    if (newHold <= 0.0) {
+      holdTime = 0.0;
+      attackTime = -newHold;
+    }
+    else {
+      holdTime = newHold;
+    }
+  }
+}
 
 EnvelopeSequence::EnvelopeSequence(float tempo, juce::uint32 signatureDenominator) {
   sequence = std::vector<AHR> {};
